@@ -35,7 +35,7 @@ void set_pin_mode(dht11_device *dht, uint8_t Mode)
 	{
 	  GPIO_InitStruct.Pin = dht->pin;
 	  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	  GPIO_InitStruct.Pull = GPIO_NOPULL;
+	  GPIO_InitStruct.Pull = GPIO_PULLUP;
 	  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 	  HAL_GPIO_Init(dht->port, &GPIO_InitStruct);
 	}else				//INPUT
@@ -54,7 +54,9 @@ uint8_t dht11_timeout(dht11_device *dht)
 		__enable_irq();
 		return 0;
 	}
+	return 1;
 }
+
 /**
  * @brief get data from DHT11
  * @param dht struct
@@ -62,7 +64,7 @@ uint8_t dht11_timeout(dht11_device *dht)
  */
 uint8_t get_dht11_data(dht11_device *dht)
 {
-	uint16_t t1 = 0, t2 = 0, mBit = 0;
+	uint16_t t1 = 0, t2 = 0, Bit = 0;
 	uint8_t humVal = 0, tempVal = 0;
 	float temp_float = 0;
 	uint8_t buffer[40];
@@ -121,15 +123,15 @@ uint8_t get_dht11_data(dht11_device *dht)
 		//if pass time 25us set as LOW
 		if(t1 > 20 && t1 < 30)
 		{
-			mBit = 0;
+			Bit = 0;
 		}
 		//if pass time 70us set as HIGH
 		else if(t1 > 60 && t1 < 80) 
 		{
-			 mBit = 1;
+			 Bit = 1;
 		}
 
-		buffer[j] = mBit;
+		buffer[j] = Bit;
 	}
 
 	HAL_TIM_Base_Stop(dht->htim); 	//stop timer
